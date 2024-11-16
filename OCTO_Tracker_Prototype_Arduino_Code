@@ -1,0 +1,153 @@
+/*
+  Arduino LSM9DS1 - Accelerometer Application
+
+  This example reads the acceleration values as relative direction and degrees,
+  from the LSM9DS1 sensor and prints them to the Serial Monitor or Serial Plotter.
+
+  The circuit:
+  - Arduino Nano 33 BLE Sense
+
+*/
+
+
+
+// Import the library for the accelerometter
+#include <Arduino_LSM9DS1.h> 
+
+// Initiate variables for different x axis, y axis, and z axis and variables to identify how much degree does the octahedron rotate in respects of 3 dimansional axes
+float x, y, z;
+int degreesX = 0;
+int degreesY = 0;
+
+// Basic configuration
+void setup() {
+  Serial.begin(9600);
+  while (!Serial);
+  Serial.println("Started");
+
+  if (!IMU.begin()) {
+    Serial.println("Failed to initialize IMU!");
+    while (1);
+  }
+
+  Serial.print("Accelerometer sample rate = ");
+  Serial.print(IMU.accelerationSampleRate());
+  Serial.println("Hz");
+}
+
+void loop() {
+// The accelrometer measures the the values of x, y, z
+  if (IMU.accelerationAvailable()) {
+    IMU.readAcceleration(x, y, z);
+  }
+
+//  degreesX and degreesY are 0 when the arduino board lying on flat surface facing up
+// When x = 0, Arduino board lays flat on table, when x = 1, Arduino board tilts up (incline) at an angle of 90 degree relative to the table surface
+// 0 <= z <= 1 is the range of z to indicate arduino boards is tilting up in range of 0 to 90 degree
+  if (x >= 0 && x <= 1 && z >= 0 && z <= 1) { 
+    x = 100 * x; // Initial x value is approximately from -1 to 1. Scaling up this value 100 times
+    degreesX = map(x, 0, 100, 0, 90); // Map the x axix to 0-90 degree. This convert x value to degree ranging from 0 to 90
+    Serial.print("Tilting up "); // Printing the result
+    Serial.print(degreesX); // Printing the result
+    Serial.println("  degrees"); // Printing the result
+  }
+
+// 0 >= z >= -1 is the approx range of z to indicate arduino boards is tilting up in range of 90 to 180 degree
+  if (x >= 0 && z <= 0 && z >= -1.04) {
+    x = 100 * x;
+    degreesX = map(x, 0, 100, 180, 90); // Map the x axes to 90-180 degree
+    Serial.print("Tilting up ");
+    Serial.print(degreesX);
+    Serial.println("  degrees");
+  }
+  if (x <= 0 && x >= -1 && z <= 0 && z >= -1.05) {
+    x = 100 * x;
+    degreesX = map(x, 0, -100, 180, 270); // Map the x axes to 180-270 degree
+    Serial.print("Tilting up ");
+    Serial.print(degreesX);
+    Serial.println("  degrees");
+  }
+  if (x < 0 && z > 0) {
+    x = 100 * x;
+    degreesX = map(x, 0, -100, 360, 270); // 4
+    Serial.print("Tilting up ");
+    Serial.print(degreesX);
+    Serial.println("  degrees");
+  }
+
+
+
+
+  if (y >= 0 && y <= 1 && z >= 0 && z <= 1) {
+    y = 100 * y;
+    degreesY = map(y, 0, 100, 0, 90); //Map the y axes to 0-90 degree
+    Serial.print("Tilting left ");
+    Serial.print(degreesY);
+    Serial.println("  degrees");
+  }
+  if (y >= 0 && y <= 1 && z <= 0 && z >= -1.04) {
+    y = 100 * y;
+    degreesY = map(y, 0, 100, 180, 90); //2
+    Serial.print("Tilting left ");
+    Serial.print(degreesY);
+    Serial.println("  degrees");
+  }
+  
+  if (y <= 0 && y >= -1 && z <= 0 && z >= -1.04) {
+    y = 100 * y;
+    degreesY = map(y, 0, -100, 180, 270); //3
+    Serial.print("Tilting left ");
+    Serial.print(degreesY);
+    Serial.println("  degrees");
+  }
+  
+  if (y <= 0 && y >= -1 && z >= 0 && z <= 1) {
+    y = 100 * y;
+    degreesY = map(y, 0, -100, 360, 270); //4
+    Serial.print("Tilting left ");
+    Serial.print(degreesY);
+    Serial.println("  degrees");
+  }
+  
+// Detect which side the octahedron is facing up
+// Deteck if the Break on octahedron is facing up (1)
+  if ((degreesX <= 10 || degreesX > 350) && (degreesY <= 10 || degreesY >= 350)) {
+    Serial.println("Break");
+  }
+
+// Detect if Challenge 1 on octahedron is facing up (2)
+if ((degreesX <= 91 && degreesX >= 71) && (degreesY >= 333 || degreesY <= 353)) {
+  Serial.println("Challenge 1");
+}
+
+// Detect if DT is facing up (3)
+if ((degreesX >= 145 && degreesX <= 165) && (degreesY >= 251 && degreesY <= 271)) {
+  Serial.println("DT");
+}
+
+// Detect if PPI is facing up (4)
+if ((degreesX >= 175 && degreesX <= 195) && (degreesY >= 170 && degreesY <= 190)) {
+  Serial.println("PPI");
+}
+
+// Detect if DBW is facing up (5)
+if ((degreesX >= 122 && degreesX <= 142) && (degreesY >= 105 && degreesY <= 125)) {
+  Serial.println("DBW");
+}
+
+// Detect if SE is facing up (6)
+if ((degreesX >= 254 && degreesX <= 274) && (degreesY >= 158 && degreesY <= 178)) {
+  Serial.println("SE");
+}
+
+// Detect if PPR is facing up (7)
+if ((degreesX >= 298 && degreesX <= 318) && (degreesY >= 283 && degreesY <= 303)) {
+  Serial.println("PPR");
+}
+
+  Serial.println("--------------------------------");
+  Serial.println("--------------------------------");
+  Serial.println();
+  Serial.println();
+  delay(800);
+}
