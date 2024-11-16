@@ -1,4 +1,4 @@
-# Challenge1
+# Challenge1 (Team C)
 This repo contains code used for Arduino Calibration and Python Application.
 ### Instuctions to Setup and Run the Arduino Code ###
 
