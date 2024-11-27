@@ -8,7 +8,7 @@ import time
 import csv
 
 try:
-    arduino = serial.Serial('COM5', 9600, timeout=10) 
+    arduino = serial.Serial('COM5', 9600, timeout=5) 
     time.sleep(2)  
 except:
     messagebox.showerror("Arduino Error", "Failed to connect to Arduino. Check the COM port and connection.")
@@ -94,7 +94,7 @@ def show_study_input():
             global is_timing, start_time, study_line, has_saved  
 
             if not hasattr(update_timer_and_arduino, "has_saved"):
-             update_timer_and_arduino.has_saved = False 
+             update_timer_and_arduino.has_saved = False  
 
             current_time = time.time()
  
@@ -112,7 +112,6 @@ def show_study_input():
                 if arduino_data:
                     print(f"Received data: {arduino_data}")  
                     arduino_label.config(text=f"Arduino Data: {arduino_data}")
-                    
 
                     if arduino_data == "Challenge 1": 
                         if not is_timing:
@@ -161,7 +160,7 @@ def show_study_input():
                             # salvev timpul într-un fișier CSV
                             with open(csv_file, 'a', newline='') as file:
                                 writer = csv.writer(file)
-                                writer.writerow([study_line,task_completion,
+                                writer.writerow([study_line, task_completion,
                                                  mood,
                                                 time.strftime("%Y-%m-%d", time.localtime(start_time)),
                                                 time.strftime("%H:%M:%S", time.localtime(start_time)),
@@ -195,7 +194,7 @@ def show_study_input():
     start_button.pack(pady=10)
 
  
-
+    ###
     # back_button = tk.Button(
     #     container,
     #     text="Back",
@@ -210,9 +209,8 @@ def show_study_input():
     
 def show_task_completion():
     task_window = tk.Toplevel(container)
-    task_window.title("Task Completion")
+    task_window.title("Task completion")
 
-    # Center the task completion window
     task_window.geometry("300x150+{}+{}".format(int(app.winfo_screenwidth() / 2 - 200), int(app.winfo_screenheight() / 2 + 200)))
 
     task_label = tk.Label(task_window, text="Did you complete your task?", font=("Arial", 14))
@@ -220,11 +218,11 @@ def show_task_completion():
 
     def save_task_completion(value):
         global task_completion
-        task_completion = value  # 1 for Yes, 0 for No
+        task_completion = value  
         print("Task completion:", "Yes" if value == 1 else "No")
-        task_window.destroy()  # Close the task window
+        task_window.destroy()  
 
-        show_study_input()  # Return to the study input page or add the back button directly
+        show_study_input() 
 
     yes_button = tk.Button(task_window, text="Yes", command=lambda: save_task_completion(1), font=("Arial", 12), bg="green", fg="white", width=10)
     no_button = tk.Button(task_window, text="No", command=lambda: save_task_completion(0), font=("Arial", 12), bg="red", fg="white", width=10)
@@ -236,7 +234,7 @@ def show_back_button():
     """Display a 'Back' button in the main container to return to the Study page."""
     back_button = tk.Button(
         container,
-        text="Back to Study",
+        text="Back to study",
         command=show_study_input,
         bg="gray",
         fg="black",
@@ -252,44 +250,39 @@ def show_mood_tracker():
         widget.destroy()
 
     top_frame = tk.Frame(container, bg="black")
-    top_frame.grid(row=0, column=0, pady=(50, 20), sticky="n") 
+    top_frame.grid(row=0, column=0, pady=(50, 20), sticky="n")  
 
-    # Mood Label
     mood_label = tk.Label(top_frame, text="MOOD TRACKER", font=("Arial", 36), fg="orange", bg="black")
     mood_label.pack(anchor="n", pady=(30, 5))
 
-    # Subtitle Label
     subtitle_label = tk.Label(top_frame, text="How satisfied do you feel after your study session today?", font=("Arial", 16), fg="white", bg="black")
     subtitle_label.pack(anchor="n", pady=(25, 10))
 
 
-    # Create a new window for mood entry
     window = tk.Toplevel(container)
     window.title("Enter Mood")
 
-    # Center the mood window
     window.geometry("500x450+{}+{}".format(int(app.winfo_screenwidth() / 2 - 250), int(app.winfo_screenheight() / 2 - 175))) 
        
     instructions_text = (
         "Please select a number from 1 to 7 to indicate your satisfaction level:\n"
-        "1. Energized - Feeling highly accomplished and motivated, ready for more.\n"
-        "2. Confident - Satisfied with the progress and confident in understanding.\n"
-        "3. Satisfied - Content with the effort and results, feeling productive.\n"
+        "1. Exhausted - Completely brunt out by the session."
+        "2. Frustrated - Upset due to difficulties encountered or lack of productivity.\n"
+        "3. Disappointed - Unsatisfied with the progress, feeling like more could have been done.\n"
         "4. Neutral - The session was average with no strong feelings.\n"
-        "5. Disappointed - Unsatisfied with the progress, feeling like more could have been done.\n"
-        "6. Frustrated - Upset due to difficulties encountered or lack of productivity.\n"
-        "7. Exhausted - Completely burnt out by the session."
+        "5. Satisfied - Content with the effort and results, feeling productive.\n"
+        "6. Confident - Satisfied with the progress  and confident in understanding.\n"
+        "7. Energized - Feeling highly accomplished and motivated, ready for more."
+       
     )
     instructions_label = tk.Label(window, text=instructions_text, font=("Arial", 12), justify="left", wraplength=450)
     instructions_label.pack(pady=10)
 
     entry_label = tk.Label(window, text="Enter your satisfaction level (1-7):", font=("Arial", 14))
     entry_label.pack(pady=10)
-    # Validation and entry for mood
     def validate_input(value):
       return value == "" or (value.isdigit() and 1 <= int(value) <= 7)
 
-    # Înregistrăm și aplicăm noua funcție de validare în câmpul de introducere pentru *Mood*
     validate_cmd = window.register(validate_input)
     mood_entry = tk.Entry(window, validate="key", validatecommand=(validate_cmd, "%P"))
     mood_entry.pack(pady=10)
@@ -299,12 +292,11 @@ def show_mood_tracker():
         mood_data = mood_entry.get()
         print("Mood data saved:", mood_data)
         window.destroy()
-        show_task_completion()  # Call task completion prompt after mood is saved
+        show_task_completion()  
 
     save_button = tk.Button(window, text="Save Mood", command=save_mood)
     save_button.pack(pady=10)
 
-    # Add a Back button to return to the study input
     back_button = tk.Button(window, text="Back", command=lambda: [window.destroy(), show_study_input()], bg="gray", fg="black", font=("Arial", 12), width=10)
     back_button.pack(pady=10)
 
@@ -323,8 +315,29 @@ def show_dashboard():
     placeholder_label = tk.Label(container, text="Dashboard details", font=("Arial", 16), fg="white", bg="black")
     placeholder_label.pack(pady=10)
 
+    image_frame = tk.Frame(container, bg="black")
+    image_frame.pack(pady=20)
+
+    try:
+        img1 = Image.open(r'C:/Users/Windows 11 ENG/Downloads/updated_visualization_with_fixed_duration_labels.jpg')
+
+        img1 = img1.resize((1200, 700), Image.Resampling.LANCZOS)
+
+        tk_img1 = ImageTk.PhotoImage(img1)
+
+        img_label1 = tk.Label(image_frame, image=tk_img1, bg="black")
+        img_label1.image = tk_img1  
+        img_label1.pack()
+
+    except Exception as e:
+        error_label = tk.Label(image_frame, text=f"Error loading image: {str(e)}", font=("Arial", 14), fg="red", bg="black")
+        error_label.pack()
+
     back_button = tk.Button(container, text="Back", command=show_home_page, bg="gray", fg="black", font=("Arial", 16), width=25, height=2)
     back_button.pack(pady=10)
+
+
+
 
 
 import tkinter as tk
@@ -431,4 +444,3 @@ def show_assignment_deadlines():
  
 show_home_page()
 app.mainloop()
-
